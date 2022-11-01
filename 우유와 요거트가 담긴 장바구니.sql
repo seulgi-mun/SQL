@@ -1,0 +1,39 @@
+"""
+데이터 분석 팀에서는 우유(Milk)와 요거트(Yogurt)를 동시에 구입한 장바구니가 있는지 알아보려 합니다.
+우유와 요거트를 동시에 구입한 장바구니의 아이디를 조회하는 SQL 문을 작성해주세요.
+이때 결과는 장바구니의 아이디 순으로 나와야 합니다.
+"""
+
+SELECT CART_ID FROM CART_PRODUCTS
+WHERE CART_ID IN (SELECT CART_ID FROM CART_PRODUCTS
+                 WHERE NAME LIKE 'Milk')
+             AND NAME = 'Yogurt'
+ORDER BY CART_ID
+
+
+SELECT CART_ID FROM CART_PRODUCTS
+WHERE NAME IN ('Milk', 'Yogurt')
+GROUP BY CART_ID
+HAVING COUNT(DISTINCT NAME) = 2
+
+
+WITH M AS (SELECT DISTINCT CART_ID, NAME FROM CART_PRODUCTS
+          WHERE NAME = 'Milk')
+, Y AS (SELECT DISTINCT CART_ID, NAME FROM CART_PRODUCTS
+       WHERE NAME = 'Yogurt')
+SELECT Y.CART_ID FROM Y
+INNER JOIN M ON Y.CART_ID = M.CART_ID
+ORDER BY Y.CART_ID
+
+
+
+SELECT DISTINCT CART_ID
+FROM CART_PRODUCTS
+WHERE NAME = 'Milk' AND 
+CART_ID IN (SELECT DISTINCT CART_ID
+            FROM CART_PRODUCTS
+            WHERE NAME = 'Yogurt')
+ORDER BY CART_ID
+
+-- WHERE절에 서브쿼리를 추가해 NAME이 Milk이고
+-- CART_ID가 서브 쿼리 안( NAME이 Yogurt 인 CART_ID)의 CART_ID에 존재한다면 조회한다
